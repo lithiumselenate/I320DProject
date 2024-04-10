@@ -20,16 +20,13 @@ def binarize_image_from_binary(data):# Convert image data to binary. Although th
     grayscale = image.convert('L')  
     binary = grayscale.point(lambda x: 0 if x < 128 else 255, '1')  
     return binary
-def resize(image): #resize the image to the nearest 16x multiply to fit CRNN input
-   original_width, original_height = image.size
-   scale_width = 16 * ((original_width - 1) // 16 + 1) / original_width
-   scale_height = 16 * ((original_height - 1) // 16 + 1) / original_height
-   scale = max(scale_width, scale_height)
-    
-   new_width = int(scale * original_width)
-   new_height = int(scale * original_height)
-   resized_image = image.resize((new_width, new_height), Image.ANTIALIAS)
-   return resized_image
+def resize(image): 
+    original_width, original_height = image.size
+    new_height = 32
+    scale = new_height / original_height
+    new_width = int(scale * original_width)
+    resized_image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+    return resized_image
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -37,8 +34,8 @@ import torchvision.transforms.functional as transform
 class MyDataset(torch.utils.data.Dataset):
     def __init__(self, file_path, transform = None, target_transform = None):
         self.df = pd.read_parquet(file_path, engine='pyarrow')
-        self.df = self.df.drop_duplicates()
         self.df = self.df.dropna()
+        print(self.df.head())
         if transform is None:
             self.transform = transforms.Compose([
                 transforms.ToTensor(),
@@ -51,15 +48,12 @@ class MyDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         row = self.df.iloc[idx]  
         image_data = row['image']
-        image = Image.open(io.BytesIO(image_data))
+        image = Image.open(io.BytesIO(image_data['bytes']))
         image = image.convert('L')  
         image = image.point(lambda x: 0 if x < 128 else 1, 'L')  
-        image = resize(image)
-        image = self.transform(image) 
-        
+        image = resize(image)  
         label_text = row['text']
         label = [ALL_CHAR.index(char) for char in label_text]  
-        
         return image, torch.tensor(label, dtype=torch.long)
 
 class BidirectionalLSTM(nn.Module):
@@ -128,7 +122,7 @@ class CRNN(nn.Module):
         # conv features
         conv = self.cnn(input)
         b, c, h, w = conv.size()
-        assert h == 1, "the height of conv must be 1"
+        assert h == 1, f"the height of conv must be 1, get {b}, {c}, {h}, {w}"
         conv = conv.squeeze(2)
         conv = conv.permute(2, 0, 1)  # [w, b, c]
         # rnn features
@@ -165,4 +159,25 @@ class CustomCTCLoss(torch.nn.Module):
             print("target_sizes:", target_sizes)
             raise Exception("NaN loss obtained.")
         return loss
-
+from torch.nn.utils.rnn import pad_sequence
+from torchvision.transforms.functional import to_tensor
+from torch.nn.functional import pad
+def collate_fn(batch):
+    max_width = max(img.width for img, _ in batch)
+    max_height = 32
+    
+    batch_images = []
+    batch_labels = []
+    
+    for img, label in batch:
+        img_tensor =  to_tensor(img)
+        left_pad = (max_width - img.width) // 2
+        right_pad = max_width - img.width - left_pad
+        top_pad = (max_height - img.height) // 2
+        bottom_pad = max_height - img.height - top_pad
+        img_padded = pad(img_tensor, (left_pad, top_pad, right_pad, bottom_pad), "constant", 0)
+        batch_images.append(img_padded)
+        batch_labels.append(label)
+    images = torch.stack(batch_images)
+    batch_labels = pad_sequence(batch_labels, batch_first=True, padding_value=0) 
+    return images.cuda(), batch_labels.cuda()

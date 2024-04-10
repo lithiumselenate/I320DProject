@@ -1,0 +1,5 @@
+- Source Code
+- # Notice
+- a Due to some problems I can only use .py files. You can still use ipnyb files if you want
+- Rename the parquet files to train, test0 and test1 and put them into your directory before running any code.
+- Make sure to install all packages, or run the code on online servers.

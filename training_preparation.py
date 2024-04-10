@@ -12,7 +12,7 @@ from torch.optim.lr_scheduler import CosineAnnealingLR, StepLR
 from torch.nn.utils.clip_grad import clip_grad_norm_
 from torch.utils.data import random_split
 from tqdm import *
-ALL_CHAR = '-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯưẠạẢảẤấẦầẨẩẪẫẬậẮắẰằẲẳẴẵẶặẸẹẺẻẼẽẾếỀềỂểỄễỆệỈỉỊịỌọỎỏỐốỒồỔổỖỗỘộỚớỜờỞởỠỡỢợỤụỦủỨứỪừỬửỮữỰựỲỳỴỵỶỷỸỹ'
+ALL_CHAR = '-ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯưẠạẢảẤấẦầẨẩẪẫẬậẮắẰằẲẳẴẵẶặẸẹẺẻẼẽẾếỀềỂểỄễỆệỈỉỊịỌọỎỏỐốỒồỔổỖỗỘộỚớỜờỞởỠỡỢợỤụỦủỨứỪừỬửỮữỰựỲỳỴỵỶỷỸỹ '
 MAX_WIDTH= 592
 MAX_HEIGHT = 384
 def binarize_image_from_binary(data):# Convert image data to binary. Although there is such column, it would be necessry for demo or other input
@@ -32,10 +32,9 @@ import torch.nn as nn
 import torch.optim as optim
 import torchvision.transforms.functional as transform
 class MyDataset(torch.utils.data.Dataset):
-    def __init__(self, file_path, transform = None, target_transform = None):
+    def __init__(self, file_path, transform=None):
         self.df = pd.read_parquet(file_path, engine='pyarrow')
         self.df = self.df.dropna()
-        print(self.df.head())
         if transform is None:
             self.transform = transforms.Compose([
                 transforms.ToTensor(),
@@ -43,18 +42,18 @@ class MyDataset(torch.utils.data.Dataset):
             ])
         else:
             self.transform = transform
+
     def __len__(self):
         return self.df.shape[0]
+
     def __getitem__(self, idx):
         row = self.df.iloc[idx]  
         image_data = row['image']
         image = Image.open(io.BytesIO(image_data['bytes']))
         image = image.convert('L')  
         image = image.point(lambda x: 0 if x < 128 else 1, 'L')  
-        image = resize(image)  
-        label_text = row['text']
-        label = [ALL_CHAR.index(char) for char in label_text]  
-        return image, torch.tensor(label, dtype=torch.long)
+        img_t = self.transform(image)
+        return img_t, row['text']
 
 class BidirectionalLSTM(nn.Module):
 
@@ -99,17 +98,17 @@ class CRNN(nn.Module):
                 cnn.add_module('relu{0}'.format(i), nn.ReLU(True))
 
         convRelu(0)
-        cnn.add_module('pooling{0}'.format(0), nn.MaxPool2d(2, 2))  # 64x16x64
+        cnn.add_module('pooling{0}'.format(0), nn.MaxPool2d(4, 2))  # 64x16x64
         convRelu(1)
-        cnn.add_module('pooling{0}'.format(1), nn.MaxPool2d(2, 2))  # 128x8x32
+        cnn.add_module('pooling{0}'.format(1), nn.MaxPool2d(4, 2))  # 128x8x32
         convRelu(2, True)
         convRelu(3)
         cnn.add_module('pooling{0}'.format(2),
-                       nn.MaxPool2d((2, 2), (2, 1), (0, 1)))  # 256x4x16
+                       nn.MaxPool2d((4, 2), (4, 2), (0, 1)))  # 256x4x16
         convRelu(4, True)
         convRelu(5)
         cnn.add_module('pooling{0}'.format(3),
-                       nn.MaxPool2d((2, 2), (2, 1), (0, 1)))  # 512x2x16
+                       nn.MaxPool2d((4, 2), (4, 2), (0, 1)))  # 512x2x16
         convRelu(6, True)  # 512x1x16
         self.cnn = cnn
         self.rnn = nn.Sequential()
@@ -159,25 +158,28 @@ class CustomCTCLoss(torch.nn.Module):
             print("target_sizes:", target_sizes)
             raise Exception("NaN loss obtained.")
         return loss
+char_to_index = {char: index for index, char in enumerate(ALL_CHAR)}
+def label_to_tensor(label):
+    return torch.tensor([char_to_index[char] for char in label])
+
 from torch.nn.utils.rnn import pad_sequence
 from torchvision.transforms.functional import to_tensor
 from torch.nn.functional import pad
 def collate_fn(batch):
-    max_width = max(img.width for img, _ in batch)
-    max_height = 32
-    
+    max_width = max(img.shape[2] for img, _ in batch)
+    max_height = max(img.shape[1] for img, _ in batch)
     batch_images = []
     batch_labels = []
-    
+    #lengths = torch.tensor([len(seq) for seq in batch_images], dtype=torch.long)
     for img, label in batch:
-        img_tensor =  to_tensor(img)
-        left_pad = (max_width - img.width) // 2
-        right_pad = max_width - img.width - left_pad
-        top_pad = (max_height - img.height) // 2
-        bottom_pad = max_height - img.height - top_pad
-        img_padded = pad(img_tensor, (left_pad, top_pad, right_pad, bottom_pad), "constant", 0)
+        left_pad = (max_width - img.shape[2]) // 2
+        right_pad = max_width - img.shape[2] - left_pad
+        top_pad = (max_height - img.shape[1]) // 2
+        bottom_pad = max_height - img.shape[1] - top_pad
+        img_padded = pad(img, (left_pad, right_pad, top_pad, bottom_pad ), "constant", 0)
         batch_images.append(img_padded)
-        batch_labels.append(label)
+        label_tensor = label_to_tensor(label)
+        batch_labels.append(label_tensor)
     images = torch.stack(batch_images)
     batch_labels = pad_sequence(batch_labels, batch_first=True, padding_value=0) 
     return images.cuda(), batch_labels.cuda()

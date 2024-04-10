@@ -19,7 +19,8 @@ dataset = tr.MyDataset(file_path='train.parquet',
                         transforms.ToTensor(),
                         transforms.Normalize((0.5,), (0.5,))
                     ]))
-dataloader = DataLoader(dataset, batch_size=32, shuffle=True, collate_fn=tr.collate_fn)
+dataloader = DataLoader(dataset, batch_size=32, shuffle=True, collate_fn=tr.collate_fn) 
+''''''
 crnn = tr.CRNN(opt={'imgH': 384, 'nChannels': 1, 'nHidden': 256, 'nClasses': len(tr.ALL_CHAR) + 1})
 crnn = crnn.cuda()
 optimizer = optim.Adam(crnn.parameters(), lr=0.001)
@@ -29,10 +30,14 @@ for epoch in range(num_epochs):
     train_loader = tqdm(dataloader)
     for images, targets in train_loader:
         logits = crnn(images) 
-        logits = logits.log_softmax(2)  
-        input_lengths = torch.full(size=(logits.size(1),), fill_value=logits.size(0), dtype=torch.long)
-        target_lengths = torch.tensor([len(t) for t in targets], dtype=torch.long)
-        loss = ctc_loss(logits, targets, input_lengths, target_lengths)  
+        logits = logits.log_softmax(2)
+        print(logits.shape) 
+        print(targets.shape)
+        #target_lengths = torch.tensor([len(t) for t in targets], dtype=torch.long)
+        target_lengths = torch.tensor([t.size(0) for t in targets], dtype=torch.long)
+        T, B, H = logits.size()
+        pred_sizes = torch.LongTensor([T for i in range(B)])
+        loss = ctc_loss(logits, targets, pred_sizes, target_lengths)  
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()

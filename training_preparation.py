@@ -13,6 +13,9 @@ from torch.nn.utils.clip_grad import clip_grad_norm_
 from torch.utils.data import random_split
 from tqdm import *
 ALL_CHAR = ' -ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯưẠạẢảẤấẦầẨẩẪẫẬậẮắẰằẲẳẴẵẶặẸẹẺẻẼẽẾếỀềỂểỄễỆệỈỉỊịỌọỎỏỐốỒồỔổỖỗỘộỚớỜờỞởỠỡỢợỤụỦủỨứỪừỬửỮữỰựỲỳỴỵỶỷỸỹ'
+def create_char_dict(s):
+    return {c: i for i, c in enumerate(s)}
+char_dict = create_char_dict(ALL_CHAR)
 MAX_WIDTH= 592
 MAX_HEIGHT = 384
 def binarize_image_from_binary(data):# Convert image data to binary. Although there is such column, it would be necessry for demo or other input
@@ -171,7 +174,7 @@ def collate_fn(batch):
     max_width = max(img.shape[2] for img, _ in batch)
     max_height = max(img.shape[1] for img, _ in batch)
     batch_images = []
-    batch_labels = []
+    words = []
     #lengths = torch.tensor([len(seq) for seq in batch_images], dtype=torch.long)
     for img, label in batch:
         left_pad = (max_width - img.shape[2]) // 2
@@ -180,11 +183,16 @@ def collate_fn(batch):
         bottom_pad = max_height - img.shape[1] - top_pad
         img_padded = pad(img, (left_pad, right_pad, top_pad, bottom_pad ), "constant", 1)
         batch_images.append(img_padded)
-        label_tensor = label_to_tensor(label)
-        batch_labels.append(label_tensor)
+        words.append(label)
+    lengths = [len(word) for word in words]
+    targets = torch.zeros(sum(lengths)).long()
+    lengths = torch.tensor(lengths)
+    for j, word in enumerate(words):
+        start = sum(lengths[:j])
+        end = lengths[j]
+        targets[start:start+end] = torch.tensor([char_dict.get(letter) for letter in word]).long()
     images = torch.stack(batch_images)
-    batch_labels = pad_sequence(batch_labels, batch_first=True, padding_value=0) 
-    return images.cuda(), batch_labels.cuda()
+    return images.cuda(), targets.cuda(), lengths.cuda()
 from torch.utils.model_zoo import load_url
 from torchvision.models.resnet import BasicBlock
 resnet_url = 'https://download.pytorch.org/models/resnet34-333f7ec4.pth'

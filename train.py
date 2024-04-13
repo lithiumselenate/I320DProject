@@ -27,20 +27,18 @@ model = tr.CTCModel(chan_in=1,                                                  
                  output_size=len(dataset.char_dict),                               
                  num_rnn_layers=4,                                                      
                  rnn_dropout=0) 
-#model.load_pretrained_resnet()
+model.load_pretrained_resnet()
 model.to('cuda')
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 loss_func = nn.CTCLoss(reduction='mean', zero_infinity=True)
 num_epochs = 20
 for epoch in range(num_epochs):
     train_loader = tqdm(dataloader)
-    for images, targets in train_loader:
+    for images, targets, lengths in train_loader:
         logits = model(images) 
         logits = logits.log_softmax(2)
-        target_lengths = torch.tensor([len(t) for t in targets], dtype=torch.long)
-        T, B, H = logits.size()
-        pred_sizes = torch.LongTensor([T for i in range(B)])
-        loss = loss_func(logits, targets, pred_sizes, target_lengths)  
+        input_lengths = torch.full((images.size()[0],), model.time_step, dtype=torch.long)
+        loss = loss_func(logits, targets, input_lengths, lengths)  
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()

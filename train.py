@@ -47,29 +47,3 @@ for epoch in range(num_epochs):
 
     print(f"Epoch {epoch+1}, Loss: {loss.item()}")
 torch.save(model.state_dict(), 'model_state_dict.pth')
-'''
-crnn = tr.CRNN(opt={'imgH': 384, 'nChannels': 1, 'nHidden': 256, 'nClasses': len(tr.ALL_CHAR) + 1})
-crnn = crnn.cuda()
-optimizer = optim.Adam(crnn.parameters(), lr=0.001)
-loss_func = nn.CTCLoss(reduction='sum', zero_infinity=True)
-num_epochs = 20
-for epoch in range(num_epochs):
-    train_loader = tqdm(dataloader)
-    for images, targets in train_loader:
-        logits = crnn(images) 
-        logits = logits.log_softmax(2)
-        print(logits.shape) 
-        print(targets.shape)
-        target_lengths = torch.tensor([len(t) for t in targets], dtype=torch.long)
-        print(target_lengths)
-        T, B, H = logits.size()
-        pred_sizes = torch.LongTensor([T for i in range(B)])
-        loss = loss_func(logits, targets, pred_sizes, target_lengths)  
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
-        train_loader.set_description(f"Epoch {epoch+1}")
-        train_loader.set_postfix(loss=loss.item())
-
-    print(f"Epoch {epoch+1}, Loss: {loss.item()}")
-torch.save(crnn.state_dict(), 'model_state_dict.pth')'''

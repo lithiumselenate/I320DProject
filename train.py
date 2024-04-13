@@ -32,7 +32,9 @@ model.to('cuda')
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 loss_func = nn.CTCLoss(reduction='mean', zero_infinity=True)
 num_epochs = 20
+losses = []
 for epoch in range(num_epochs):
+    round_loss = []
     train_loader = tqdm(dataloader)
     for images, targets, lengths in train_loader:
         logits = model(images) 
@@ -44,6 +46,8 @@ for epoch in range(num_epochs):
         optimizer.step()
         train_loader.set_description(f"Epoch {epoch+1}")
         train_loader.set_postfix(loss=loss.item())
+        round_loss.append(loss.item())
+    losses.append(round_loss)
 
     print(f"Epoch {epoch+1}, Loss: {loss.item()}")
 torch.save(model.state_dict(), 'model_state_dict.pth')

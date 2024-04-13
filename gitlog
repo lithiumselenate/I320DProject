@@ -1,0 +1,90 @@
+[33mcommit 8ca60ec1a4c048416881fe12251cc66cb0127b8f[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m
+Author: lithiumselenate <hankhe22@utexas.edu>
+Date:   Fri Apr 12 22:28:48 2024 -0500
+
+    remove model file for commiting
+
+[33mcommit bdca026d4d3d61bc193f33d2aa7632c448ddbff5[m
+Merge: 462e476 34a3bd2
+Author: lithiumselenate <hankhe22@utexas.edu>
+Date:   Fri Apr 12 22:27:01 2024 -0500
+
+    Merge branch 'main' of https://github.com/lithiumselenate/I320DProject
+
+[33mcommit 34a3bd21f3a325bac1ae9e2c95d12d5d7d791f4f[m[33m ([m[1;31morigin/main[m[33m)[m
+Author: lithiumselenate <138357702+lithiumselenate@users.noreply.github.com>
+Date:   Fri Apr 12 22:26:57 2024 -0500
+
+    Update .gitignore
+
+[33mcommit 462e47677ad62ca402add6b7d16272e4d37b8142[m
+Author: lithiumselenate <hankhe22@utexas.edu>
+Date:   Fri Apr 12 22:24:53 2024 -0500
+
+    first model
+
+[33mcommit c20a5d26896f2bf237f16b8bb1129b5b575047df[m
+Author: lithiumselenate <hankhe22@utexas.edu>
+Date:   Fri Apr 12 22:16:01 2024 -0500
+
+    trained first model. Still need retrain/ change in parameter
+
+[33mcommit 8f160014778f71f209c313f53731ba2d8b814051[m
+Author: lithiumselenate <hankhe22@utexas.edu>
+Date:   Fri Apr 12 20:20:48 2024 -0500
+
+    delete not used code
+
+[33mcommit 8be363456ca930bfacb6781d90334f25ac9021a6[m
+Author: lithiumselenate <hankhe22@utexas.edu>
+Date:   Fri Apr 12 19:07:56 2024 -0500
+
+    Rewrite collate_fn, output format corrected
+
+[33mcommit 9b031c53354efb577ed0b561674a44ef74b44a35[m
+Author: lithiumselenate <hankhe22@utexas.edu>
+Date:   Thu Apr 11 23:21:43 2024 -0500
+
+    Changed to a runable model
+
+[33mcommit fe4d629072c498b42620d4e70f487a54db10f508[m
+Author: lithiumselenate <hankhe22@utexas.edu>
+Date:   Wed Apr 10 18:55:53 2024 -0500
+
+    resolve pooling par, still weird bug
+
+[33mcommit c6f2e5a50067bc94c6e82cd07a75eb216694e2c7[m
+Author: lithiumselenate <hankhe22@utexas.edu>
+Date:   Wed Apr 10 15:20:18 2024 -0500
+
+    add training code, still require debug
+
+[33mcommit 8630887ce176facb43a66040f78a06310b6fc327[m
+Author: lithiumselenate <hankhe22@utexas.edu>
+Date:   Wed Apr 10 12:22:16 2024 -0500
+
+    Some update: CTC Loss, new method for resize
+
+[33mcommit d3a32e282f86d05de48b2064a71bd38283efa166[m
+Author: lithiumselenate <hankhe22@utexas.edu>
+Date:   Wed Apr 10 12:19:48 2024 -0500
+
+    Some updates
+
+[33mcommit 6c97081a30bad208abf95301c9ec517ef71b56da[m
+Author: lithiumselenate <138357702+lithiumselenate@users.noreply.github.com>
+Date:   Tue Apr 9 19:53:18 2024 -0500
+
+    Create README.md
+
+[33mcommit 5a7a689ac8472f597c9408877926535d7e27859d[m[33m ([m[1;31morigin/master[m[33m, [m[1;32mmaster[m[33m)[m
+Author: lithiumselenate <hankhe22@utexas.edu>
+Date:   Tue Apr 9 19:47:12 2024 -0500
+
+    Upload all existing code
+
+[33mcommit dbb0d872c3122329bc81ad5ba34da703c362f521[m
+Author: lithiumselenate <hankhe22@utexas.edu>
+Date:   Tue Apr 9 19:42:38 2024 -0500
+
+    Initial commit

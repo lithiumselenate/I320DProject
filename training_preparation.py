@@ -340,4 +340,3 @@ class CTCModel(nn.Module):
         assert len(self.to_freeze) == len([p for p in self.parameters()])
 #class packed(object):
 #    def __init__(self, model, dataloader, )
-        

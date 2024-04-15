@@ -90,6 +90,22 @@ def collate_fn(batch):
         targets[start:start+end] = torch.tensor([char_dict.get(letter) for letter in word]).long()
     images = torch.stack(batch_images)
     return images.cuda(), targets.cuda(), lengths.cuda()
+def collate_fn_test(batch):
+    max_width = max(img.shape[2] for img, _ in batch)
+    max_height = max(img.shape[1] for img, _ in batch)
+    batch_images = []
+    words = []
+    #lengths = torch.tensor([len(seq) for seq in batch_images], dtype=torch.long)
+    for img, label in batch:
+        left_pad = (max_width - img.shape[2]) // 2
+        right_pad = max_width - img.shape[2] - left_pad
+        top_pad = (max_height - img.shape[1]) // 2
+        bottom_pad = max_height - img.shape[1] - top_pad
+        img_padded = pad(img, (left_pad, right_pad, top_pad, bottom_pad ), "constant", 1)
+        batch_images.append(img_padded)
+        words.append(label)
+    images = torch.stack(batch_images)
+    return images.cuda(), words
 from torch.utils.model_zoo import load_url
 from torchvision.models.resnet import BasicBlock
 resnet_url = 'https://download.pytorch.org/models/resnet34-333f7ec4.pth'
@@ -216,7 +232,6 @@ class CTCModel(nn.Module):
                 char_list.append(dup_rm.astype(int))
                 
         return char_list
-    
     def load_pretrained_resnet(self):
         
         self.to_freeze = []

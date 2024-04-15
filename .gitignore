@@ -7,3 +7,6 @@ test1.parquet
 train.parquet
 model_state_dict.pth
 __pycache__/training_preparation.cpython-311.pyc
+train1.parquet
+test.csv
+train0.parquet

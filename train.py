@@ -14,14 +14,14 @@ from torch.utils.data import random_split
 from tqdm import *
 from torch.utils.data import DataLoader
 import torch.optim as optim
-dataset = tr.MyDataset(file_path='train.parquet',
+dataset = tr.MyDataset(file_path='train1.parquet',
                     transform=transforms.Compose([
                         transforms.ToTensor(),
                         transforms.Normalize((0.5,), (0.5,))
                     ]))
 dataloader = DataLoader(dataset, batch_size=32, shuffle=True, collate_fn=tr.collate_fn)
 model = tr.CTCModel(chan_in=1,                                                             # 3 channel image - imagenet pretrained
-                 time_step=96,                                                          # this is the max length possible                                                  
+                 time_step=17,                                                          # this is the max length possible                                                  
                  feature_size=512,                                                      # conv outputs 512, 32, 1
                  hidden_size=512,                        
                  output_size=len(dataset.char_dict),                               
@@ -51,6 +51,7 @@ for epoch in range(num_epochs):
 
     print(f"Epoch {epoch+1}, Loss: {loss.item()}")
 torch.save(model.state_dict(), 'model_state_dict.pth')
+print(losses)
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np

@@ -50,7 +50,6 @@ class MyDataset(torch.utils.data.Dataset):
 
     def __len__(self):
         return self.df.shape[0]
-
     def __getitem__(self, idx):
         row = self.df.iloc[idx]  
         image_data = row['binary_image']
@@ -201,6 +200,7 @@ class CTCModel(nn.Module):
         self.rnn = RNN(feature_size=feature_size, hidden_size=hidden_size, 
                        output_size=output_size, num_layers=num_rnn_layers,
                        dropout=rnn_dropout)
+        self.decode_map = char_dict
         
         if pretrained and cpu:
             self.load_state_dict(torch.load('weights/iam_ctc_resnet34_weights.pth',
@@ -227,11 +227,16 @@ class CTCModel(nn.Module):
             softmax_out = out.softmax(2).argmax(2).permute(1, 0).cpu().numpy()
             char_list = []
             for i in range(0, softmax_out.shape[0]):
-                dup_rm = softmax_out[i, :][np.insert(np.diff(softmax_out[i, :]).astype(np.bool), 0, True)]
+                dup_rm = softmax_out[i, :][np.insert(np.diff(softmax_out[i, :]).astype(np.bool_), 0, True)]
                 dup_rm = dup_rm[dup_rm != 0]
                 char_list.append(dup_rm.astype(int))
                 
         return char_list
+    def predict(self, img, transforms=None, show_img=False, dev='cpu'):
+        outs = self.best_path_decode(img)
+        pred = ''.join([self.decode_map.get(letter) for letter in outs[0]])
+        print(pred)
+        return pred
     def load_pretrained_resnet(self):
         
         self.to_freeze = []

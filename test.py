@@ -14,7 +14,7 @@ from torch.utils.data import random_split
 from tqdm import *
 from torch.utils.data import DataLoader
 import torch.optim as optim
-dataset = tr.MyDataset(file_path='test1.parquet',
+dataset = tr.MyDataset(file_path='train0.parquet',
                     transform=transforms.Compose([
                         transforms.ToTensor(),
                         transforms.Normalize((0.5,), (0.5,))
@@ -31,11 +31,25 @@ model.load_state_dict(torch.load('model_state_dict.pth'))
 model.to('cuda')
 model.eval()
 from torchmetrics import CharErrorRate
+met = []
 for images, targets in dataloader:
-    images = images.to('cuda')
-    output = model(images).softmax(2).argmax(2).cpu().detach().numpy()
-    print(output.shape)
-    #chars = [model.char_dict[index] for index in output]
-    #result = ''.join(chars)
-
+    logit = model(images).argmax(2).squeeze().cpu().numpy()
+    logit = logit.transpose()
+    metrics = []
+    for i in range(len(images)):
+        predicted = logit[i]
+        predicted = predicted[predicted != 0]
+        chars = [dataset.char_dict[c] for c in predicted]
+        p = ''.join(chars)
+        CER = CharErrorRate()
+        cer = CER(p, targets[i])
+        metrics.append(cer)
+    ave_cer = sum(metrics) / len(metrics)   
+    met.append(ave_cer)
+print(f'Overall CER: {sum(met) / len(met)}')
+import matplotlib.pyplot as plt
+ys = met
+xs = [x for x in range(len(ys))]
+plt.plot(xs, ys)
+plt.show()
     

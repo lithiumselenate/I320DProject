@@ -10,3 +10,5 @@ __pycache__/training_preparation.cpython-311.pyc
 train1.parquet
 test.csv
 train0.parquet
+verify.parquet
+test.parquet

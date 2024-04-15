@@ -14,7 +14,7 @@ from torch.utils.data import random_split
 from tqdm import *
 from torch.utils.data import DataLoader
 import torch.optim as optim
-dataset = tr.MyDataset(file_path='train0.parquet',
+dataset = tr.MyDataset(file_path='test.parquet',
                     transform=transforms.Compose([
                         transforms.ToTensor(),
                         transforms.Normalize((0.5,), (0.5,))
@@ -39,6 +39,7 @@ for images, targets in dataloader:
     for i in range(len(images)):
         predicted = logit[i]
         predicted = predicted[predicted != 0]
+        predicted = [x for i, x in enumerate(predicted) if i == 0 or x != 1 or predicted[i-1] != 1]
         chars = [dataset.char_dict[c] for c in predicted]
         p = ''.join(chars)
         CER = CharErrorRate()

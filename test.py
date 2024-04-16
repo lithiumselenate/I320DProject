@@ -27,7 +27,7 @@ model = tr.CTCModel(chan_in=1,
                  output_size=len(dataset.char_dict),                               
                  num_rnn_layers=4,                                                      
                  rnn_dropout=0) 
-model.load_state_dict(torch.load('model_state_dict.pth'))
+model.load_state_dict(torch.load('new_model_state_dict.pth'))
 model.to('cuda')
 model.eval()
 from torchmetrics import CharErrorRate

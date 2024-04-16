@@ -46,7 +46,6 @@ for epoch in range(num_epochs):
     train_loader = tqdm(dataloader)
     for images, targets, lengths in train_loader:
         logits = model(images) 
-        preds = logits.argmax(2).squeeze().cpu().numpy().transpose()
         logits = logits.log_softmax(2)
         input_lengths = torch.full((images.size()[0],), model.time_step, dtype=torch.long)
         loss = loss_func(logits, targets, input_lengths, lengths)
@@ -59,11 +58,12 @@ for epoch in range(num_epochs):
         round_loss.append(loss.item()) 
     losses.append(sum(round_loss) / len(round_loss))
     print(f"Epoch {epoch+1}, Loss:  {sum(round_loss) / len(round_loss)}")
+    metrics = []
     for images, targets in dataloader_v:
         logit = model(images)
         logit = logit.argmax(2).squeeze().cpu().numpy()
         logit = logit.transpose()
-        metrics = []
+        
         for i in range(len(images)):
             predicted = logit[i]
             predicted = predicted[predicted != 0]
@@ -73,7 +73,7 @@ for epoch in range(num_epochs):
             CER = CharErrorRate()
             cer = CER(p, targets[i])
             metrics.append(cer)
-        ave_cer = sum(metrics) / len(metrics)
+    ave_cer = sum(metrics) / len(metrics)
     print(f"Epoch {epoch+1}, Accuracy on verifying set:  {1-ave_cer}")      
     met.append(ave_cer)
 torch.save(model.state_dict(), 'new_model_state_dict.pth')

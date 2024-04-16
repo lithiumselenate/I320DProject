@@ -52,6 +52,6 @@ print(f'Overall CER: {sum(met) / len(met)}')
 import matplotlib.pyplot as plt
 ys = met
 xs = [x for x in range(len(ys))]
-plt.plot(xs, ys)
+plt.scatter(xs, ys)
 plt.show()
     

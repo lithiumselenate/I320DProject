@@ -33,7 +33,8 @@ model.eval()
 from torchmetrics import CharErrorRate
 met = []
 for images, targets in dataloader:
-    logit = model(images).argmax(2).squeeze().cpu().numpy()
+    logit = model(images)
+    logit = logit.argmax(2).squeeze().cpu().numpy()
     logit = logit.transpose()
     metrics = []
     for i in range(len(images)):

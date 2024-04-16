@@ -74,8 +74,8 @@ for epoch in range(num_epochs):
             cer = CER(p, targets[i])
             metrics.append(cer)
         ave_cer = sum(metrics) / len(metrics)
-        print(f"Epoch {epoch+1}, Accuracy on verifying set:  {1-ave_cer}")  
-        met.append(ave_cer)
+    print(f"Epoch {epoch+1}, Accuracy on verifying set:  {1-ave_cer}")      
+    met.append(ave_cer)
 torch.save(model.state_dict(), 'new_model_state_dict.pth')
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D

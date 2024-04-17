@@ -16,4 +16,4 @@
 - Download the train****.parquet file from the dataset.
 - use pandas and sklearn to split the dataset into 3 parts. train, validation and test, ratio .8:.1:.1. Name these files as shown in the train.py and test.py
 - Run the train.py code for training, test.py for testing. Note that the model file is not in the repo, either train it yourself or ask me.
-- 来自Hank: 高低得请我吃顿饭哈哈哈哈哈
+- 来自Hank: 是不是应该请我吃顿饭哈哈哈哈哈

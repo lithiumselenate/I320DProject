@@ -11,7 +11,7 @@
 - cudnn https://developer.nvidia.com/cudnn-downloads
 - install pytorch use this pip command: pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
 - After installation, you should check if cuda is available. In python, type import torch, and see if torch.cuda.is_available() is true
-- Other required packages: matplotlib, pandas, numpy, tqdm, PIL( pip install pillow), pycharm, torchmetric, sklearn 
+- Other required packages: matplotlib, pandas, numpy, tqdm, PIL( pip install pillow), pycharm, torchmetrics, sklearn 
 - Download the train****.parquet file from the dataset.
 - use pandas and sklearn to split the dataset into 3 parts. train, validation and test, ratio .8:.1:.1. Name these files as shown in the train.py and test.py
 - Run the train.py code for training, test.py for testing. Note that the model file is not in the repo, either train it yourself or ask me.

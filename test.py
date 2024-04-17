@@ -45,6 +45,7 @@ for images, targets in dataloader:
         p = ''.join(chars)
         CER = CharErrorRate()
         cer = CER(p, targets[i])
+        #print(p, targets[i])
         metrics.append(cer)
     ave_cer = sum(metrics) / len(metrics)   
     met.append(ave_cer)

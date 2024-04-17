@@ -8,7 +8,6 @@ from torchmetrics import CharErrorRate
 import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
-from torch.optim.lr_scheduler import CosineAnnealingLR, StepLR
 from torch.nn.utils.clip_grad import clip_grad_norm_
 from torch.utils.data import random_split
 from tqdm import *
@@ -78,7 +77,6 @@ for epoch in range(num_epochs):
     met.append(ave_cer)
 torch.save(model.state_dict(), 'new_model_state_dict.pth')
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 ys = losses
 xs = [x for x in range(len(ys))]

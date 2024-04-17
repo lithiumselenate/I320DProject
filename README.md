@@ -5,6 +5,7 @@
 - Make sure to install all packages, or run the code on online servers.
 - I strongly recommend to run the code locally. Y'all know how bad colab is.
 # How to Run on your device
+- Required python versioin: 3.8 or higher. 
 - Install all necessary packages on your own device.
 - You will need to install pytorch for gpu on your computer. This requires an Nvidia GPU as well as cuda and cudnn installed.
 - cuda: https://developer.nvidia.com/cuda-12-1-0-download-archive

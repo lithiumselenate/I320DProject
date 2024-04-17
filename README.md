@@ -26,3 +26,4 @@
 ## Report
 - Final report.
 - I am actually quite satisfied with the accuracy, knowing other groups' model performance lmao.
+- 不想再训练了啊啊啊啊啊啊每次训练模型都两三个小时打不了游戏

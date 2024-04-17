@@ -18,3 +18,11 @@
 - Run the train.py code for training, test.py for testing. Note that the model file is not in the repo, either train it yourself or ask me.
 - Each round the program will print average loss and also test the model on the validation set. I am not sure if it will or will not be plotted, but if not you can manually plot them.
 - 来自Hank: 是不是应该请我吃顿饭哈哈哈哈哈
+# Things we need to do.
+## image to binary
+- I trained the model based on binary column. I am thinking of either retrain it with RGB images, or process a RGB to binary method for our demo.
+## Demo
+- Demo for actual recognition. Use something we learnt this week.
+## Report
+- Final report.
+- I am actually quite satisfied with the accuracy, knowing other groups' model performance lmao.

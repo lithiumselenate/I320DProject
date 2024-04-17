@@ -53,6 +53,7 @@ print(f'Overall CER: {sum(met) / len(met)}')
 import matplotlib.pyplot as plt
 ys = met
 xs = [x for x in range(len(ys))]
-plt.scatter(xs, ys)
+plt.boxplot(ys)
+plt.xlabel('Character Error Rate')
 plt.show()
     

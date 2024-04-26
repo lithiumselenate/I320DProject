@@ -17,13 +17,11 @@
 - use pandas and sklearn to split the dataset into 3 parts. train, validation and test, ratio .8:.1:.1. Name these files as shown in the train.py and test.py
 - Run the train.py code for training, test.py for testing. Note that the model file is not in the repo, either train it yourself or ask me.
 - Each round the program will print average loss and also test the model on the validation set. I am not sure if it will or will not be plotted, but if not you can manually plot them.
-- 来自Hank: 是不是应该请我吃顿饭哈哈哈哈哈
-# Things we need to do.
-## image to binary
-- I trained the model based on binary column. I am thinking of either retrain it with RGB images, or process a RGB to binary method for our demo.
-## Demo
-- Demo for actual recognition. Use something we learnt this week.
+# Demo
+- Done with the demo. May need my own computer for the demo
+- Move the existing .py files to the directory and run demo_gui.py
+- use the files in the demo images folder.
+
 ## Report
 - Final report.
-- I am actually quite satisfied with the accuracy, knowing other groups' model performance lmao.
-- 不想再训练了啊啊啊啊啊啊每次训练模型都两三个小时打不了游戏
+

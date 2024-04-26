@@ -58,7 +58,27 @@ class MyDataset(torch.utils.data.Dataset):
         #image = image.point(lambda x: 0 if x < 192 else 255, 'L')  
         img_t = self.transform(image)
         return img_t, row['text']
+class DemoDataset(torch.utils.data.Dataset):
+    def __init__(self, df, transform=None):
+        self.df = df
+        if transform is None:
+            self.transform = transforms.Compose([
+                transforms.ToTensor(),
+                transforms.Normalize((0.5,), (0.5,))  
+            ])
+        else:
+            self.transform = transform
+        self.char_dict = ALL_CHAR
 
+
+    def __len__(self):
+        return self.df.shape[0]
+    def __getitem__(self, idx):
+        row = self.df.iloc[idx]  
+        image = row['binary_image']
+        #image = image.point(lambda x: 0 if x < 192 else 255, 'L')  
+        img_t = self.transform(image)
+        return img_t, row['text']
 char_to_index = {char: index for index, char in enumerate(ALL_CHAR)}
 def label_to_tensor(label):
     return torch.tensor([char_to_index[char] for char in label])
@@ -128,6 +148,22 @@ def collate_fn_test(batch):
         words.append(label)
     images = torch.stack(batch_images)
     return images.cuda(), words
+def collate_fn_test_cpu(batch):
+    max_width = max(img.shape[2] for img, _ in batch)
+    max_height = max(img.shape[1] for img, _ in batch)
+    batch_images = []
+    words = []
+    #lengths = torch.tensor([len(seq) for seq in batch_images], dtype=torch.long)
+    for img, label in batch:
+        left_pad = (max_width - img.shape[2]) // 2
+        right_pad = max_width - img.shape[2] - left_pad
+        top_pad = (max_height - img.shape[1]) // 2
+        bottom_pad = max_height - img.shape[1] - top_pad
+        img_padded = pad(img, (left_pad, right_pad, top_pad, bottom_pad ), "constant", 1)
+        batch_images.append(img_padded)
+        words.append(label)
+    images = torch.stack(batch_images)
+    return images, words
 def collate_fn_test_rgb(batch):
     max_width = max(img.shape[2] for img, _ in batch)
     max_height = max(img.shape[1] for img, _ in batch)

@@ -19,8 +19,10 @@
 - Each round the program will print average loss and also test the model on the validation set. I am not sure if it will or will not be plotted, but if not you can manually plot them.
 # Demo
 - Done with the demo. May need my own computer for the demo
-- Move the existing .py files to the directory and run demo_gui.py
+- based on gradio
+- Move the existing .py files to your directory and run demo_gui.py. You also need the model file
 - use the files in the demo images folder.
+
 
 ## Report
 - Final report.

@@ -42,8 +42,8 @@ print(char_dict)
 chars = [char_dict[c] for c in predicted]
 p = ''.join(chars)
 print(p)
-def get_single(image_path):
-    image = Image.open(image_path)
+
+def get_single(image):
     threshold = 128
     binary_image = image.convert("L").point(lambda pixel: 0 if pixel < threshold else 255)
     transform = torchvision.transforms.ToTensor()

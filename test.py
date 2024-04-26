@@ -63,14 +63,13 @@ for images, targets in outlier:
     for i in range(len(images)):
         img = images[i]
         img = transforms.ToPILImage()(img)
-        img.show()
+        img.save(f'outlier_{i}.png')
         predicted = logit[i]
         predicted = predicted[predicted != 0]
         predicted = [x for i, x in enumerate(predicted) if i == 0 or x != 1 or predicted[i-1] != 1]
         chars = [dataset.char_dict[c] for c in predicted]
         p = ''.join(chars)
-        print(f'Predicted: {p}, Should be: {targets[i]}')
-        a = input()
+        print(f'Number {i}, Predicted: {p}, Should be: {targets[i]}')
 import matplotlib.pyplot as plt
 ys = met
 xs = [x for x in range(len(ys))]

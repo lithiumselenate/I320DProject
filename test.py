@@ -32,11 +32,13 @@ model.to('cuda')
 model.eval()
 from torchmetrics import CharErrorRate
 met = []
+outlier=[]
 for images, targets in dataloader:
     logit = model(images)
     logit = logit.argmax(2).squeeze().cpu().numpy()
     logit = logit.transpose()
     metrics = []
+    
     for i in range(len(images)):
         predicted = logit[i]
         predicted = predicted[predicted != 0]
@@ -47,9 +49,28 @@ for images, targets in dataloader:
         cer = CER(p, targets[i])
         #print(p, targets[i])
         metrics.append(cer)
-    ave_cer = sum(metrics) / len(metrics)   
+    ave_cer = sum(metrics) / len(metrics)
+    if   ave_cer > 0.3:
+        pair = images, targets
+        outlier.append(pair)
     met.append(ave_cer)
 print(f'Overall CER: {sum(met) / len(met)}')
+for images, targets in outlier:
+    print("Outlier detected")
+    logit = model(images)
+    logit = logit.argmax(2).squeeze().cpu().numpy()
+    logit = logit.transpose()
+    for i in range(len(images)):
+        img = images[i]
+        img = transforms.ToPILImage()(img)
+        img.show()
+        predicted = logit[i]
+        predicted = predicted[predicted != 0]
+        predicted = [x for i, x in enumerate(predicted) if i == 0 or x != 1 or predicted[i-1] != 1]
+        chars = [dataset.char_dict[c] for c in predicted]
+        p = ''.join(chars)
+        print(f'Predicted: {p}, Should be: {targets[i]}')
+        a = input()
 import matplotlib.pyplot as plt
 ys = met
 xs = [x for x in range(len(ys))]

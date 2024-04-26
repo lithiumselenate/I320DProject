@@ -89,6 +89,29 @@ def collate_fn(batch):
         targets[start:start+end] = torch.tensor([char_dict.get(letter) for letter in word]).long()
     images = torch.stack(batch_images)
     return images.cuda(), targets.cuda(), lengths.cuda()
+def collate_fn_rgb(batch):
+    max_width = max(img.shape[2] for img, _ in batch)
+    max_height = max(img.shape[1] for img, _ in batch)
+    batch_images = []
+    words = []
+    #lengths = torch.tensor([len(seq) for seq in batch_images], dtype=torch.long)
+    for img, label in batch:
+        left_pad = (max_width - img.shape[2]) // 2
+        right_pad = max_width - img.shape[2] - left_pad
+        top_pad = (max_height - img.shape[1]) // 2
+        bottom_pad = max_height - img.shape[1] - top_pad
+        img_padded = pad(img, (left_pad, right_pad, top_pad, bottom_pad ), "constant", 0)
+        batch_images.append(img_padded)
+        words.append(label)
+    lengths = [len(word) for word in words]
+    targets = torch.zeros(sum(lengths)).long()
+    lengths = torch.tensor(lengths)
+    for j, word in enumerate(words):
+        start = sum(lengths[:j])
+        end = lengths[j]
+        targets[start:start+end] = torch.tensor([char_dict.get(letter) for letter in word]).long()
+    images = torch.stack(batch_images)
+    return images.cuda(), targets.cuda(), lengths.cuda()
 def collate_fn_test(batch):
     max_width = max(img.shape[2] for img, _ in batch)
     max_height = max(img.shape[1] for img, _ in batch)
@@ -101,6 +124,22 @@ def collate_fn_test(batch):
         top_pad = (max_height - img.shape[1]) // 2
         bottom_pad = max_height - img.shape[1] - top_pad
         img_padded = pad(img, (left_pad, right_pad, top_pad, bottom_pad ), "constant", 1)
+        batch_images.append(img_padded)
+        words.append(label)
+    images = torch.stack(batch_images)
+    return images.cuda(), words
+def collate_fn_test_rgb(batch):
+    max_width = max(img.shape[2] for img, _ in batch)
+    max_height = max(img.shape[1] for img, _ in batch)
+    batch_images = []
+    words = []
+    #lengths = torch.tensor([len(seq) for seq in batch_images], dtype=torch.long)
+    for img, label in batch:
+        left_pad = (max_width - img.shape[2]) // 2
+        right_pad = max_width - img.shape[2] - left_pad
+        top_pad = (max_height - img.shape[1]) // 2
+        bottom_pad = max_height - img.shape[1] - top_pad
+        img_padded = pad(img, (left_pad, right_pad, top_pad, bottom_pad ), "constant", 0)
         batch_images.append(img_padded)
         words.append(label)
     images = torch.stack(batch_images)
@@ -225,6 +264,7 @@ class CTCModel(nn.Module):
             out = self.forward(xb)
             
             softmax_out = out.softmax(2).argmax(2).permute(1, 0).cpu().numpy()
+            print(softmax_out)
             char_list = []
             for i in range(0, softmax_out.shape[0]):
                 dup_rm = softmax_out[i, :][np.insert(np.diff(softmax_out[i, :]).astype(np.bool_), 0, True)]

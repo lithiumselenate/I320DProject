@@ -11,4 +11,4 @@ gr.Interface(
     outputs=output,
     title="Handwriting recognition",
     description="Select File and click on submit to get the prediction."
-).launch(debug = True)
+).launch(share=True)

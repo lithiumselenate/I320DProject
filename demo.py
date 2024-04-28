@@ -84,7 +84,6 @@ def get_single(image):
     '''
 import gradio as gr
 import demo 
-import training_preparation
 
 inputs=gr.Image(label="Input Image", type="pil")
 output1 = gr.Textbox(label="Prediction")

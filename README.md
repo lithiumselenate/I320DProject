@@ -20,7 +20,7 @@
 # Demo
 - Done with the demo. May need my own computer for the demo
 - based on gradio
-- Move the existing .py files to your directory and run demo_gui.py. You also need the model file
+- Move the existing .py files to your directory and run demo.py. You also need the model file
 - use the files in the demo images folder.
 
 

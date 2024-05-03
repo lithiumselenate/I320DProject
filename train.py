@@ -35,7 +35,7 @@ model = tr.CTCModel(chan_in=1,
                  rnn_dropout=0) 
 model.load_pretrained_resnet()
 model.to('cuda')
-optimizer = optim.Adam(model.parameters(), lr=0.002)
+optimizer = optim.Adam(model.psarameters(), lr=0.002)
 loss_func = nn.CTCLoss(reduction='mean', zero_infinity=True)
 num_epochs = 40
 losses = []

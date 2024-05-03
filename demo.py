@@ -19,33 +19,6 @@ model = tr.CTCModel(chan_in=1,
 model.load_state_dict(torch.load('new_model_state_dict.pth'))
 model.to('cpu')
 model.eval()
-# Read the image
-'''
-image = Image.open("test5.png")
-
-# Binarize the image
-threshold = 128
-binary_image = image.convert("L").point(lambda pixel: 0 if pixel < threshold else 255)
-
-# Transform the binary image into a torch tensor
-transform = torchvision.transforms.ToTensor()
-tensor_image = transform(binary_image)
-print(tensor_image.shape)
-print()
-# Add a batch dimension
-tensor_image = tensor_image.unsqueeze(0)
-logit = model(tensor_image)
-logit = logit.argmax(2).squeeze().cpu().numpy()
-print(logit)
-predicted = logit
-predicted = predicted[predicted != 0]
-print(predicted)
-predicted = [x for i, x in enumerate(predicted) if i == 0 or x != 1 or predicted[i-1] != 1]
-print(char_dict)
-chars = [char_dict[c] for c in predicted]
-p = ''.join(chars)
-print(p)
-'''
 import pandas as pd
 def get_single(image):
     threshold = 128
